@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - Connect\o</title>
+    <!-- Sets up HTML5 structure, Configures responsive viewport, Sets page title -->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f3f2ef;
+        }
+        .nav {
+            background-color: white;
+            padding: 10px 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+        }
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1150px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .nav h1 {
+            color: #0a66c2;
+            margin: 0;
+        }
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #666;
+        }
+        .nav-links a.active {
+            color: #0a66c2;
+            font-weight: bold;
+        }
+        .messages-container {
+            max-width: 1200px;
+            margin: 80px auto 20px;
+            display: flex;
+            gap: 20px;
+            height: calc(100vh - 100px);
+        }
+        .conversations-list {
+            flex: 1;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+        .conversation-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .conversation-item:hover {
+            background-color: #f3f2ef;
+        }
+        .conversation-item.active {
+            background-color: #e3f2fd;
+        }
+        .conversation-item img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+        .conversation-info {
+            flex-grow: 1;
+        }
+        .conversation-name {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 2px;
+        }
+        .conversation-preview {
+            color: #666;
+            font-size: 14px;
+        }
+        .chat-window {
+            flex: 2;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 1;
+        }
+        .chat-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 0;
+        }
+        .message {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            margin: 5px 0;
+            position: relative;
+        }
+        .message.sent {
+            background-color: #0a66c2;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+        .message.received {
+            background-color: #f3f2ef;
+            color: #000;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+        .message-timestamp {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            text-align: right;
+        }
+        .message.sent .message-timestamp {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .message-input {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+        .message-input textarea {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            resize: none;
+            height: 40px;
+            font-family: Arial, sans-serif;
+        }
+        .message-input button {
+            background-color: #0a66c2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .message-input button:hover {
+            background-color: #004182;
+        }
+        .group-chat-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .group-chat-header:hover {
+            background: #f0f0f0;
+        }
+        .group-chat-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+        }
+        .group-members {
+            position: sticky;
+            top: 80px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 0;
+            display: none;
+            border-top: 1px solid #eee;
+            z-index: 1;
+        }
+        .group-members.show {
+            display: block;
+        }
+        .group-members h4 {
+            margin: 0 0 10px 0;
+            color: #666;
+        }
+        .member-item {
+            display: flex;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .member-item:last-child {
+            border-bottom: none;
+        }
+        .member-role {
+            font-size: 12px;
+            color: #0a66c2;
+            margin-left: 10px;
+        }
+        .group-message {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 5px 0;
+            max-width: 70%;
+        }
+        .group-message .sender {
+            font-weight: bold;
+            color: #0a66c2;
+            margin-bottom: 5px;
+        }
+        .group-message .content {
+            color: #333;
+        }
+        .group-message .message-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        /* Add default avatar style */
+        .default-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #0a66c2;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Creates a fixed navigation bar at the top, Contains the Connect\o logo and navigation links, Uses flexbox for layout and spacing -->
+    <nav class="nav">
+        <div class="nav-content">
+            <h1>Connect\o</h1>
+            <div class="nav-links">
+                <a href="Project.html">Home</a>
+                <a href="new_network.html">Network</a>
+                <a href="messages.html" class="active">Messages</a>
+                <a href="user.html">User</a>
+                <a href="database.html">Database</a>
+            </div>
+        </div>
+    </nav>
+    <!-- Creates a container for the messages section, Contains a list of conversations and a chat window, Uses flexbox for layout and spacing -->  
+    <div class="messages-container">
+        <div class="conversations-list" id="conversationsList">
+            Loading conversations...
+        </div>
+        <div class="chat-window" id="chatWindow">
+            <div class="chat-header" id="chatHeader">
+                Select a conversation
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                No messages to display
+            </div>
+            <div class="message-input">
+                <textarea id="messageInput" placeholder="Type a message..." 
+                         onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"></textarea>
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+    <!-- Creates a script for the messages section, Contains error handling for image loading, sample conversations data, and functions for rendering conversations and messages -->
+    <script>
+        // Add error handling for image loading
+        function handleImageError(img) {
+            img.onerror = null;
+            const name = img.alt.split("'")[0];
+            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
+            img.style.display = 'none';
+            const defaultAvatar = document.createElement('div');
+            defaultAvatar.className = 'default-avatar';
+            defaultAvatar.textContent = initials;
+            img.parentNode.insertBefore(defaultAvatar, img);
+        }
+
+        // Sample conversations data
+        const conversations = [
+            { 
+                name: 'Yash Mehta', 
+                photo: 'Yash_DP.png', 
+                messages: [
+                    { text: 'Hey Arnav! Want to collaborate on a game project?', sent: false, timestamp: '2024-03-20T10:00:00Z' },
+                    { text: 'Sure! What kind of game are you thinking about?', sent: true, timestamp: '2024-03-20T10:05:00Z' },
+                    { text: 'I have an idea for a 2D platformer. We can use Unity!', sent: false, timestamp: '2024-03-20T10:10:00Z' },
+                    { text: 'Sounds interesting! When do you want to start?', sent: true, timestamp: '2024-03-20T10:15:00Z' }
+                ]
+            },
+            { 
+                name: 'Vandan Choksi', 
+                photo: 'Vandan_DP.jpg', 
+                messages: [
+                    { text: 'Hi Arnav! Can you review the new product features?', sent: false, timestamp: '2024-03-19T15:00:00Z' },
+                    { text: 'Of course! Send me the details.', sent: true, timestamp: '2024-03-19T15:05:00Z' },
+                    { text: 'Great! I\'ll share the document with you.', sent: false, timestamp: '2024-03-19T15:10:00Z' }
+                ]
+            },
+            { 
+                name: 'Jay Bharatia', 
+                photo: 'Jay_DP.jpg', 
+                messages: [
+                    { text: 'Thanks for the code review feedback!', sent: false, timestamp: '2024-03-18T09:00:00Z' },
+                    { text: 'You\'re welcome! The changes look good now.', sent: true, timestamp: '2024-03-18T09:05:00Z' },
+                    { text: 'Appreciate your help!', sent: false, timestamp: '2024-03-18T09:10:00Z' }
+                ]
+            },
+            {
+                name: 'Python',
+                photo: 'Py.png',
+                isGroup: true,
+                members: [
+                    { name: 'You', role: 'Member' },
+                    { name: 'Yash Mehta', role: 'Member' },
+                    { name: 'Vandan Choksi', role: 'Member' },
+                    { name: 'Jay Bharatia', role: 'Member' }
+                ],
+                messages: [
+                    { sender: 'Yash Mehta', text: 'New video uploaded: Python in 1 hour one shot video', timestamp: '2024-03-19T14:00:00Z' },
+                    { sender: 'You', text: 'Great! I\'ll watch it tonight', timestamp: '2024-03-19T14:05:00Z' },
+                    { sender: 'Vandan Choksi', text: 'The video is very helpful for beginners', timestamp: '2024-03-19T14:10:00Z' },
+                    { sender: 'Jay Bharatia', text: 'Can someone help me with Python decorators?', timestamp: '2024-03-19T14:15:00Z' },
+                    { sender: 'You', text: 'I can help you with that!', timestamp: '2024-03-19T14:20:00Z' }
+                ]
+            },
+            {
+                name: 'Java',
+                photo: 'Java.jpg',
+                isGroup: true,
+                members: [
+                    { name: 'You', role: 'Member' },
+                    { name: 'Yash Mehta', role: 'Member' },
+                    { name: 'Vandan Choksi', role: 'Member' },
+                    { name: 'Jay Bharatia', role: 'Member' }
+                ],
+                messages: [
+                    { sender: 'Yash Mehta', text: 'New assignment created: Object-Oriented Programming in Java', timestamp: '2024-03-18T11:00:00Z' },
+                    { sender: 'You', text: 'When is the deadline?', timestamp: '2024-03-18T11:05:00Z' },
+                    { sender: 'Vandan Choksi', text: 'The deadline is next Monday, 25th March', timestamp: '2024-03-18T11:10:00Z' },
+                    { sender: 'Jay Bharatia', text: 'Can we work in groups?', timestamp: '2024-03-18T11:15:00Z' },
+                    { sender: 'Yash Mehta', text: 'Yes, maximum 3 students per group', timestamp: '2024-03-18T11:20:00Z' }
+                ]
+            },
+            {
+                name: 'NMIMS Official',
+                photo: 'NMIMS.png',
+                isGroup: true,
+                members: [
+                    { name: 'You', role: 'Member' },
+                    { name: 'Yash Mehta', role: 'Member' },
+                    { name: 'Vandan Choksi', role: 'Member' },
+                    { name: 'Jay Bharatia', role: 'Member' },
+                    { name: 'Professor', role: 'Admin' },
+                    { name: 'Ansh Jain', role: 'Member' }
+                ],
+                messages: [
+                    { sender: 'Professor', text: 'Welcome to the NMIMS group chat! This is where we\'ll share important announcements and discuss course-related topics.', timestamp: '2024-03-20T09:00:00Z' },
+                    { sender: 'You', text: 'Thank you for creating this group!', timestamp: '2024-03-20T09:05:00Z' },
+                    { sender: 'Yash Mehta', text: 'When is our next assignment due?', timestamp: '2024-03-20T09:10:00Z' },
+                    { sender: 'Professor', text: 'The next assignment is due on March 25th. Please check the course portal for details.', timestamp: '2024-03-20T09:15:00Z' },
+                    { sender: 'Vandan Choksi', text: 'Is there a study group meeting this week?', timestamp: '2024-03-20T09:20:00Z' },
+                    { sender: 'Jay Bharatia', text: 'Yes, we\'re meeting on Thursday at 3 PM in the library.', timestamp: '2024-03-20T09:25:00Z' },
+                    { sender: 'Ansh Jain', text: 'Do we have college tomorrow?', timestamp: '2024-03-20T09:30:00Z' }
+                ]
+            }
+        ];
+        // Initializes the conversations
+        let currentConversation = null;
+        // Initializes the current conversation
+        function initializeConversations() {
+            try {
+                const savedConversations = localStorage.getItem('conversations');
+                if (savedConversations) {
+                    conversations.forEach(conv => {
+                        const savedConv = JSON.parse(savedConversations).find(c => c.name === conv.name);
+                        if (savedConv) {
+                            conv.messages = savedConv.messages;
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error initializing conversations:', error);
+            }
+        }
+        // Saves the conversations
+        function saveConversations() {
+            try {
+                localStorage.setItem('conversations', JSON.stringify(conversations));
+            } catch (error) {
+                console.error('Error saving conversations:', error);
+            }
+        }
+        // Renders the conversations
+        function renderConversations() {
+            try {
+                const conversationsList = document.getElementById('conversationsList');
+                conversationsList.innerHTML = conversations.map(conv => `
+                    <div class="conversation-item ${conv === currentConversation ? 'active' : ''}" 
+                         onclick="selectConversation('${conv.name}')">
+                        <img src="${conv.photo}" alt="${conv.name}'s photo" onerror="handleImageError(this)">
+                        <div class="conversation-info">
+                            <div class="conversation-name">${conv.name}</div>
+                            <div class="conversation-preview">
+                                ${conv.messages.length > 0 ? 
+                                    (conv.isGroup ? 
+                                        `${conv.messages[conv.messages.length - 1].sender}: ${conv.messages[conv.messages.length - 1].text}` :
+                                        conv.messages[conv.messages.length - 1].text) : 
+                                    'No messages yet'}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error rendering conversations:', error);
+            }
+        }
+        // Selects a conversation
+        function selectConversation(name) {
+            try {
+                currentConversation = conversations.find(conv => conv.name === name);
+                if (currentConversation) {
+                    renderChatHeader();
+                    renderMessages();
+                }
+            } catch (error) {
+                console.error('Error selecting conversation:', error);
+            }
+        }
+        // Renders the chat header
+        function renderChatHeader() {
+            try {
+                const chatHeader = document.getElementById('chatHeader');
+                if (currentConversation) {
+                    if (currentConversation.isGroup) {
+                        chatHeader.innerHTML = `
+                            <div class="group-chat-header" onclick="toggleGroupMembers(this)">
+                                <img src="${currentConversation.photo}" alt="${currentConversation.name}" onerror="handleImageError(this)">
+                                <div>
+                                    <h3>${currentConversation.name}</h3>
+                                    <p style="color: #666; margin: 0;">Group Chat</p>
+                                </div>
+                            </div>
+                            <div class="group-members">
+                                <h4>Group Members</h4>
+                                ${currentConversation.members.map(member => `
+                                    <div class="member-item">
+                                        <span>${member.name}</span>
+                                        <span class="member-role">${member.role}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    } else {
+                        chatHeader.innerHTML = `
+                            <div class="chat-header">
+                                <img src="${currentConversation.photo}" alt="${currentConversation.name}" onerror="handleImageError(this)">
+                                <div>
+                                    <div style="font-weight: bold;">${currentConversation.name}</div>
+                                    <div style="color: #666; font-size: 14px;">Online</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    chatHeader.innerHTML = '<div style="text-align: center; width: 100%; color: #666;">Select a conversation</div>';
+                }
+            } catch (error) {
+                console.error('Error rendering chat header:', error);
+            }
+        }
+        // Renders the messages
+        function renderMessages() {
+            try {
+                const chatMessages = document.getElementById('chatMessages');
+                if (currentConversation) {
+                    chatMessages.innerHTML = currentConversation.messages.map(msg => {
+                        if (currentConversation.isGroup) {
+                            return `
+                                <div class="group-message">
+                                    <div class="sender">${msg.sender}</div>
+                                    <div class="content">${msg.text}</div>
+                                    <div class="message-info">
+                                        <span>${new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            return `
+                                <div class="message ${msg.sent ? 'sent' : 'received'}">
+                                    ${msg.text}
+                                    <div class="message-timestamp">${new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                </div>
+                            `;
+                        }
+                    }).join('');
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                } else {
+                    chatMessages.innerHTML = '';
+                }
+            } catch (error) {
+                console.error('Error rendering messages:', error);
+            }
+        }
+        // Sends a message
+        function sendMessage() {
+            try {
+                if (!currentConversation) return;
+                
+                const messageInput = document.getElementById('messageInput');
+                const text = messageInput.value.trim();
+                
+                if (!text) return;
+
+                const now = new Date();
+                const timestamp = now.toISOString();
+                
+                if (currentConversation.isGroup) {
+                    currentConversation.messages.push({
+                        sender: 'You',
+                        text: text,
+                        timestamp: timestamp
+                    });
+                } else {
+                    currentConversation.messages.push({
+                        text: text,
+                        sent: true,
+                        timestamp: timestamp
+                    });
+                    
+                    setTimeout(() => {
+                        currentConversation.messages.push({
+                            text: `Reply from ${currentConversation.name}`,
+                            sent: false,
+                            timestamp: new Date().toISOString()
+                        });
+                        saveConversations();
+                        renderMessages();
+                        renderConversations();
+                    }, 1000);
+                }
+                
+                saveConversations();
+                renderMessages();
+                renderConversations();
+                messageInput.value = '';
+            } catch (error) {
+                console.error('Error sending message:', error);
+            }
+        }
+        // Toggles the group members
+        function toggleGroupMembers(header) {
+            try {
+                const membersSection = header.nextElementSibling;
+                membersSection.classList.toggle('show');
+            } catch (error) {
+                console.error('Error toggling group members:', error);
+            }
+        }
+        // Initializes the page
+        window.onload = function() {
+            try {
+                initializeConversations();
+                renderConversations();
+                //   Initializes the selected recipient
+                const selectedRecipient = localStorage.getItem('selectedRecipient');
+                if (selectedRecipient) {
+                    selectConversation(selectedRecipient);
+                    localStorage.removeItem('selectedRecipient');
+                }
+            } catch (error) {
+                console.error('Error initializing page:', error);
+            }
+        };
+    </script>
+</body>
+</html> 

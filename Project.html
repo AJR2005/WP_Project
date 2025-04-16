@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Networking Site</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f3f2ef;">
+    <!-- Sets up HTML5 structure, Configures responsive viewport, Sets page title -->
+    <nav style="background-color: white; padding: 10px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: fixed; width: 100%; top: 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1150px; margin: 0 auto; padding: 0 20px;">
+            <h1 style="color: #0a66c2; margin: 0;">Connect\o</h1>
+            <div style="display: flex; gap: 20px;">
+                <a href="Project.html" style="text-decoration: none; color: #0a66c2; font-weight: bold;">Home</a>
+                <a href="new_network.html" style="text-decoration: none; color: #666;">Network</a>
+                <a href="messages.html" style="text-decoration: none; color: #666;">Messages</a>
+                <a href="user.html" style="text-decoration: none; color: #666;">User</a>
+                <a href="database.html" style="text-decoration: none; color: #666;">Database</a>
+            </div>
+        </div>
+    </nav>
+    <!-- Creates a fixed navigation bar at the top, Contains the Connect\o logo and navigation links, Uses flexbox for layout and spacing -->
+    <div style="max-width: 1200px; margin: 80px auto 20px; display: flex; gap: 20px;">
+        <div style="flex: 1; background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: fit-content;">
+            <div style="text-align: center;">
+                <img id="profilePic" src="dp.jpg" alt="Profile Picture" 
+                     style="width: 150px; height: 150px; border-radius: 50%; margin-bottom: 15px;">
+                <h2 id="userName">Arnav Jadhav</h2>
+                <p id="userTitle" style="color: #666;">Software Developer</p>
+                <button onclick="editProfile()" 
+                        style="background-color: #0a66c2; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer;">
+                    Edit Profile
+                </button>
+            </div>
+        </div>
+        <!-- Creates a container for the profile section, Contains the user's profile picture, name, and title, Uses flexbox for layout and spacing -->
+        <div style="flex: 2;">
+            <div style="background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <textarea id="postContent" placeholder="Write a post..." 
+                         onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); createPost(); }"
+                         style="width: calc(100% - 24px); height: 100px; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; resize: none; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.5; margin-bottom: 10px; outline: none; transition: border-color 0.3s ease;"></textarea>
+                <button onclick="createPost()" 
+                        style="background-color: #0a66c2; color: white; border: none; padding: 10px 20px; border-radius: 20px; margin-top: 10px; cursor: pointer; font-size: 14px; font-weight: 600; width: 100px;">
+                    Post
+                </button>
+            </div>
+
+            <div id="postsContainer"></div>
+        </div>
+
+        <div style="flex: 1; background: white; border-radius: 10px; padding: 20px; height: fit-content; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <h3 style="margin: 0 0 15px 0;">People you may know</h3>
+            <div id="suggestions"></div>
+        </div>
+    </div>
+    <!-- Creates a container for the posts section, Contains the posts, Uses flexbox for layout and spacing -->
+    <script>
+        const suggestedPeople = [
+            { name: 'Yash Mehta', title: 'Game Developer', photo: 'Yash_DP.png' },
+            { name: 'Vandan Choksi', title: 'Product Manager', photo: 'Vandan_DP.jpg' },
+            { name: 'Jay Bharatia', title: 'Software Engineer', photo: 'Jay_DP.jpg' },
+        ];
+        // Initializes the suggestions
+        function initializeSuggestions() {
+            const suggestionsContainer = document.getElementById('suggestions');
+            suggestedPeople.forEach(person => {
+                const div = document.createElement('div');
+                div.style.padding = '10px';
+                div.style.borderBottom = '1px solid #ddd';
+                div.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <img src="${person.photo}" alt="${person.name}'s photo" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                        <div style="flex-grow: 1;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="cursor: pointer;" onclick="viewProfile('${person.name}', '${person.title}')">
+                                    <div style="font-weight: bold;">${person.name}</div>
+                                    <div style="color: #666; font-size: 14px;">${person.title}</div>
+                                </div>
+                                <button onclick="viewProfile('${person.name}', '${person.title}')" 
+                                        style="background-color: transparent; color: #0a66c2; border: 1px solid #0a66c2; padding: 5px 15px; border-radius: 15px; cursor: pointer;">
+                                    View
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                suggestionsContainer.appendChild(div);
+            });
+        }
+        // Views the profile
+        function viewProfile(name, title) {
+            const person = suggestedPeople.find(p => p.name === name);
+            const profilePhoto = person ? person.photo : 'https://via.placeholder.com/150';
+            
+            const profileContent = `
+                <div style="padding: 20px; text-align: center;">
+                    <img src="${profilePhoto}" alt="${name}'s Profile Picture" 
+                         style="width: 150px; height: 150px; border-radius: 50%; margin-bottom: 15px; object-fit: cover;">
+                    <h2>${name}</h2>
+                    <p style="color: #666;">${title}</p>
+                    <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+                        <button onclick="sendMessage('${name}')" 
+                                style="background-color: transparent; color: #0a66c2; border: 1px solid #0a66c2; padding: 10px 20px; border-radius: 20px; cursor: pointer;">
+                            Message
+                        </button>
+                        <button onclick="closeProfile()" 
+                                style="background-color: #0a66c2; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer;">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            const overlay = document.createElement('div');
+            overlay.id = 'profileOverlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            `;
+
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                background-color: white;
+                border-radius: 10px;
+                max-width: 500px;
+                width: 90%;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            `;
+            modal.innerHTML = profileContent;
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+        }
+        // Sends a message to a recipient
+        function sendMessage(recipientName) {
+            localStorage.setItem('selectedRecipient', recipientName);
+            window.location.href = 'messages.html';
+        }
+        // Closes the profile
+        function closeProfile() {
+            const overlay = document.getElementById('profileOverlay');
+            if (overlay) {
+                overlay.remove();
+            }
+        }
+        // Creates a post
+        function createPost() {
+            const content = document.getElementById('postContent').value;
+            if (!content.trim()) return;
+
+            const userProfilePic = document.getElementById('profilePic').src;
+            const userName = document.getElementById('userName').innerText;
+
+            const newPost = {
+                userProfilePic,
+                userName,
+                content,
+                timestamp: new Date().toLocaleString(),
+            };
+
+            const posts = JSON.parse(localStorage.getItem('posts')) || [];
+            posts.unshift(newPost);
+
+            localStorage.setItem('posts', JSON.stringify(posts));
+
+            renderPosts();
+
+            document.getElementById('postContent').value = '';
+        }
+        // Edits the user's profile
+        function editProfile() {
+            const newName = prompt('Enter new name:', document.getElementById('userName').innerText);
+            const newTitle = prompt('Enter new title:', document.getElementById('userTitle').innerText);
+            
+            if (newName) document.getElementById('userName').innerText = newName;
+            if (newTitle) document.getElementById('userTitle').innerText = newTitle;
+        }
+        // Likes a post
+        function likePost(button) {
+            if (button.innerText === '👍 Like') {
+                button.innerText = '👍 Liked';
+                button.style.color = '#0a66c2';
+                button.style.fontWeight = 'bold';
+            } else {
+                button.innerText = '👍 Like';
+                button.style.color = '#666';
+                button.style.fontWeight = 'normal';
+            }
+        }
+        // Comments on a post
+        function commentPost(button) {
+            const comment = prompt('Add a comment:');
+            if (comment) {
+                const commentDiv = document.createElement('div');
+                commentDiv.style.margin = '10px 0';
+                commentDiv.style.padding = '10px';
+                commentDiv.style.backgroundColor = '#f3f2ef';
+                commentDiv.style.borderRadius = '5px';
+                commentDiv.style.maxHeight = '100px';
+                commentDiv.style.overflowY = 'auto';
+                commentDiv.innerHTML = `
+                    <strong>Arnav Jadhav:</strong> ${comment}
+                `;
+                button.parentElement.parentElement.appendChild(commentDiv);
+            }
+        }
+        // Shares a post
+        function sharePost(button) {
+            const overlay = document.createElement('div');
+            overlay.id = 'shareOverlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            `;
+
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                background-color: white;
+                border-radius: 10px;
+                max-width: 500px;
+                width: 90%;
+                padding: 20px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            `;
+
+            modal.innerHTML = `
+                <h3 style="margin-top: 0;">Share with your connections</h3>
+                <div id="shareConnections" style="max-height: 300px; overflow-y: auto;">
+                    ${suggestedPeople.map(person => `
+                        <div style="display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #eee;">
+                            <img src="${person.photo}" alt="${person.name}" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; object-fit: cover;">
+                            <div style="flex-grow: 1;">
+                                <div style="font-weight: bold;">${person.name}</div>
+                                <div style="color: #666; font-size: 14px;">${person.title}</div>
+                            </div>
+                            <button onclick="shareWithPerson('${person.name}', this)" 
+                                    style="background-color: #0a66c2; color: white; border: none; padding: 5px 15px; border-radius: 15px; cursor: pointer;">
+                                Share
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+                <div style="margin-top: 20px; text-align: right;">
+                    <button onclick="closeShareModal()" 
+                            style="background-color: #666; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer;">
+                        Close
+                    </button>
+                </div>
+            `;
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+        }
+        // Shares a post with a person
+        function shareWithPerson(name, button) {
+            alert(`Post shared with ${name}!`);
+            button.innerHTML = 'Shared';
+            button.style.backgroundColor = '#666';
+            button.style.cursor = 'default';
+            button.disabled = true;
+        }
+        // Closes the share modal
+        function closeShareModal() {
+            const overlay = document.getElementById('shareOverlay');
+            if (overlay) {
+                overlay.remove();
+            }
+        }
+        // Renders the posts
+        function renderPosts() {
+            const postsContainer = document.getElementById('postsContainer');
+            postsContainer.innerHTML = '';
+        
+            const posts = JSON.parse(localStorage.getItem('posts')) || [];
+        
+            posts.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.style.background = 'white';
+                postElement.style.borderRadius = '10px';
+                postElement.style.padding = '20px';
+                postElement.style.marginBottom = '20px';
+                postElement.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)';
+        
+                postElement.innerHTML = `
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <img src="${post.userProfilePic}" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; object-fit: cover;">
+                        <div>
+                            <div style="font-weight: bold;">${post.userName}</div>
+                            <div style="color: #666; font-size: 14px;">${post.timestamp}</div>
+                        </div>
+                    </div>
+                    <p>${post.content}</p>
+                    <div style="display: flex; gap: 20px; margin-top: 10px;">
+                        <button onclick="likePost(this)" style="background: none; border: none; color: #666; cursor: pointer;">👍 Like</button>
+                        <button onclick="commentPost(this)" style="background: none; border: none; color: #666; cursor: pointer;">💬 Comment</button>
+                        <button onclick="sharePost(this)" style="background: none; border: none; color: #666; cursor: pointer;">↗️ Share</button>
+                    </div>
+                `;
+        
+                postsContainer.appendChild(postElement);
+            });
+        }
+        // Initializes the suggestions and renders the posts when the page loads
+        window.onload = function() {
+            initializeSuggestions();
+            renderPosts();
+        };
+    </script>
+</body>
+</html>

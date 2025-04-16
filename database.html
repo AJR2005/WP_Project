@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database - Connect\o</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f3f2ef;
+        }
+        .nav {
+            background-color: white;
+            padding: 10px 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+        }
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1150px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .nav h1 {
+            color: #0a66c2;
+            margin: 0;
+        }
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #666;
+        }
+        .nav-links a.active {
+            color: #0a66c2;
+            font-weight: bold;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 80px auto 20px;
+            padding: 20px;
+        }
+        .database-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #0a66c2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        button:hover {
+            background-color: #004182;
+        }
+        .delete-btn {
+            background-color: #d11124;
+        }
+        .delete-btn:hover {
+            background-color: #a00d1c;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            background-color: #666;
+            color: white;
+        }
+        .tab.active {
+            background-color: #0a66c2;
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-content">
+            <h1>Connect\o</h1>
+            <div class="nav-links">
+                <a href="Project.html">Home</a>
+                <a href="new_network.html">Network</a>
+                <a href="messages.html">Messages</a>
+                <a href="user.html">User</a>
+                <a href="database.html" class="active">Database</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" onclick="showTable('users')">Users</div>
+            <div class="tab" onclick="showTable('posts')">Posts</div>
+            <div class="tab" onclick="showTable('comments')">Comments</div>
+        </div>
+
+        <div class="database-section">
+            <h2>Add New Record</h2>
+            <form id="addForm" onsubmit="return addRecord(event)">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="text" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select id="role" required>
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                        <option value="moderator">Moderator</option>
+                    </select>
+                </div>
+                <button type="submit">Add Record</button>
+            </form>
+        </div>
+
+        <div class="database-section">
+            <h2>Database Records</h2>
+            <div class="table-container">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize database
+        let db = {
+            users: [],
+            posts: [],
+            comments: []
+        };
+
+        // Load data from localStorage
+        function loadData() {
+            const savedData = localStorage.getItem('database');
+            if (savedData) {
+                db = JSON.parse(savedData);
+            }
+            renderTable();
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('database', JSON.stringify(db));
+        }
+
+        // Add new record
+        function addRecord(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const role = document.getElementById('role').value;
+            
+            const newRecord = {
+                id: Date.now(),
+                name: name,
+                email: email,
+                role: role
+            };
+            
+            db.users.push(newRecord);
+            saveData();
+            renderTable();
+            
+            // Clear form
+            event.target.reset();
+            
+            return false;
+        }
+
+        // Delete record
+        function deleteRecord(id) {
+            if (confirm('Are you sure you want to delete this record?')) {
+                db.users = db.users.filter(record => record.id !== id);
+                saveData();
+                renderTable();
+            }
+        }
+
+        // Render table
+        function renderTable() {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+            
+            db.users.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.id}</td>
+                    <td>${record.name}</td>
+                    <td>${record.email}</td>
+                    <td>${record.role}</td>
+                    <td>
+                        <button class="delete-btn" onclick="deleteRecord(${record.id})">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Show different tables
+        function showTable(tableName) {
+            // Update active tab
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update form fields based on table
+            const form = document.getElementById('addForm');
+            form.innerHTML = `
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="text" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select id="role" required>
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                        <option value="moderator">Moderator</option>
+                    </select>
+                </div>
+                <button type="submit">Add Record</button>
+            `;
+            
+            // Update table headers
+            const table = document.getElementById('dataTable');
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            `;
+            
+            renderTable();
+        }
+
+        // Initialize page
+        window.onload = function() {
+            loadData();
+        };
+    </script>
+</body>
+</html> 

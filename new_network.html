@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network - Social Networking Site</title>
+    <!-- Defines main layout styles, Creates horizontal scrolling container for profiles, Styles profile cards and buttons, Customizes scrollbar appearance -->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f3f2ef;
+        }
+        .network-container {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 20px;
+            gap: 20px;
+            max-width: 100%;
+            scroll-behavior: smooth;
+        }
+        .network-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        .network-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .profile-card {
+            flex: 0 0 auto;
+            text-align: center;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            min-width: 200px;
+        }
+        .profile-card img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+        .message-button {
+            background-color: #0a66c2;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .small-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+}
+    </style>
+</head>
+<body>
+    <!-- Creates a fixed navigation bar at the top, Contains the Connect\o logo and navigation links, Uses flexbox for layout and spacing -->
+    <nav style="background-color: white; padding: 10px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: fixed; width: 100%; top: 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1150px; margin: 0 auto;">
+            <h1 style="color: #0a66c2; margin: 0;">Connect\o</h1>
+            <div style="display: flex; gap: 20px;">
+                <a href="Project.html" style="text-decoration: none; color: #666;">Home</a>
+                <a href="new_network.html" style="text-decoration: none; color: #0a66c2; font-weight: bold;">Network</a>
+                <a href="messages.html" style="text-decoration: none; color: #666;">Messages</a>
+                <a href="user.html" style="text-decoration: none; color: #666;">User</a>
+                <a href="database.html" style="text-decoration: none; color: #666;">Database</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div style="max-width: 1200px; margin: 80px auto 20px; padding: 20px;">
+        <!-- Creates a container for the network page, Contains a section for people you may know and groups, Uses flexbox for layout and spacing -->
+        <div style="background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <h2>People You May Know</h2>
+            <div class="network-container">
+                <!-- Creates a horizontal scrolling container for profile cards, Contains profile cards for people you may know, Uses flexbox for layout and spacing -->
+                <div class="profile-card">
+                    <!-- Creates a profile card for Yash Mehta, Contains Yash Mehta's profile picture, name, title, and message button -->
+                    <img src="Yash_DP.png">
+                    <h3>Yash Mehta</h3>
+                    <p style="color: #666; margin: 5px 0;">Game Developer</p>
+                    <button onclick="sendMessage('Yash Mehta')" style="background-color: #0a66c2; color: white; border: none; padding: 8px 15px; border-radius: 15px; cursor: pointer; margin-top: 10px;">Message</button>
+                </div>
+                <!-- Creates a profile card for Vandan Choksi, Contains Vandan Choksi's profile picture, name, title, and message button -->
+                <div class="profile-card">
+                    <img src="Vandan_DP.jpg">
+                    <h3>Vandan Choksi</h3>
+                    <p style="color: #666; margin: 5px 0;">Product Manager</p>
+                    <button onclick="sendMessage('Vandan Choksi')" style="background-color: #0a66c2; color: white; border: none; padding: 8px 15px; border-radius: 15px; cursor: pointer; margin-top: 10px;">Message</button>
+                </div>
+                <div class="profile-card">
+                    <img src="Jay_DP.jpg">
+                    <h3>Jay Bharatia</h3>
+                    <p style="color: #666; margin: 5px 0;">Software Engineer</p>
+                    <button onclick="sendMessage('Jay Bharatia')" style="background-color: #0a66c2; color: white; border: none; padding: 8px 15px; border-radius: 15px; cursor: pointer; margin-top: 10px;">Message</button>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+        <!-- Creates a container for the groups section, Contains a section for groups, Uses flexbox for layout and spacing -->
+        <div style="background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <h2>Groups</h2>
+            <div class="groups-container" style="display: flex; flex-direction: column; gap: 15px;">
+                <div class="group-card" onclick="openGroupChat('NMIMS Official', 'NMIMS.png')" style="display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 10px; background: white; cursor: pointer;">
+                    <img src="NMIMS.png" class="small-image">
+                    <div>
+                        <h3 style="font-size: 25px;">NMIMS Official</h3>
+                        <p style="color: #666; font-size: 22px; margin: 5px 0;">Ansh Jain: Do we have college tomorrow?</p>
+                    </div>
+                </div>
+                <div class="group-card" onclick="openGroupChat('Python', 'Py.png')" style="display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 10px; background: white; cursor: pointer;">
+                    <img src="Py.png" class="small-image">
+                    <div>
+                        <h3 style="font-size: 25px;">Python</h3>
+                        <p style="color: #666; font-size: 22px; margin: 5px 0;">Python in 1 hour one shot video</p>
+                    </div>
+                </div>
+                <div class="group-card" onclick="openGroupChat('Java', 'Java.jpg')" style="display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 10px; background: white; cursor: pointer;">
+                    <img src="Java.jpg" class="small-image">
+                    <div>
+                        <h3 style="font-size: 25px;">Java</h3>
+                        <p style="color: #666; font-size: 25px; margin: 5px 0;">New assignment created</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Sends a message to a recipient when the user clicks the message button
+        function sendMessage(recipientName) {
+            localStorage.setItem('selectedRecipient', recipientName);
+            localStorage.setItem('isGroupChat', 'false');
+            window.location.href = 'messages.html';
+        }
+        // Opens a group chat when the user clicks the group card   
+        function openGroupChat(groupName, groupImage) {
+            localStorage.setItem('selectedRecipient', groupName);
+            localStorage.setItem('isGroupChat', 'true');
+            localStorage.setItem('groupImage', groupImage);
+            window.location.href = 'messages.html';
+        }
+    </script>
+</body>
+</html>

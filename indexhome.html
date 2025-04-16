@@ -1,0 +1,376 @@
+<!-- This is the home page of the Connect\o social networking site -->
+<!DOCTYPE html>
+<html lang="en" ng-app="homeApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - Connect\o</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+<style>
+    /* This is the style for the home page */
+body {
+    font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f3f2ef;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.left-section {
+    flex: 1;
+    padding: 20px;
+    text-align: center;
+}
+
+.logo {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 20px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-circle {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0a66c2, #004182);
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.logo-text {
+    color: white;
+    font-size: 48px;
+    font-weight: bold;
+    position: relative;
+    z-index: 1;
+}
+
+.logo-connector {
+    position: absolute;
+    width: 40px;
+    height: 4px;
+    background: #0a66c2;
+    top: 50%;
+    right: -20px;
+    transform: translateY(-50%);
+}
+
+.logo-dot {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #0a66c2;
+    border-radius: 50%;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+}
+
+.left-section h1 {
+    font-size: 56px;
+    color: #0a66c2;
+    margin-bottom: 0;
+    font-weight: 600;
+    margin-top: 0;
+}
+
+.left-section p {
+    font-size: 32px;
+    color: #333;
+    margin-top: 10px;
+}
+
+.right-section {
+    flex: 1;
+    max-width: 400px;
+    background: white;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+h2 {
+    font-size: 32px;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: 400;
+}
+
+form {
+    margin-top: 20px;
+}
+
+label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"] {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+input:focus {
+    border-color: #0a66c2;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(10, 102, 194, 0.2);
+}
+
+span {
+    color: #d11124;
+    font-size: 12px;
+    display: block;
+    margin-top: -8px;
+    margin-bottom: 10px;
+}
+
+button[type="submit"] {
+    width: 100%;
+    background-color: #0a66c2;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 28px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.2s;
+}
+
+button[type="submit"]:hover {
+    background-color: #004182;
+}
+
+.show-password-container {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.show-password-container input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.show-password-container label {
+    margin: 0;
+    font-weight: normal;
+    font-size: 14px;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.divider span {
+    padding: 0 10px;
+    color: #666;
+    font-size: 14px;
+}
+
+.join-now {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+.join-now a {
+    color: #0a66c2;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.join-now a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    .left-section {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .left-section h1 {
+        font-size: 40px;
+    }
+
+    .left-section p {
+        font-size: 24px;
+    }
+
+    .right-section {
+        width: 100%;
+        max-width: none;
+    }
+}
+</style>
+<body ng-controller="HomeController">
+    <!-- This is the body of the home page -->
+    <div class="container">
+        <!-- This is the container of the home page -->
+        <div class="left-section">
+            <!-- This is the left section of the home page -->
+            <div class="logo">
+                <div class="logo-circle">
+                    <span class="logo-text">C</span>
+                </div>
+                <div class="logo-connector"></div>
+                <div class="logo-dot"></div>
+            </div>
+            <h1>Connect\o</h1>
+            <p>Welcome to your college community</p>
+        </div>  
+        <div class="right-section">
+            <!-- This is the right section of the home page -->
+            <h2>Sign in</h2>
+            <form name="loginForm" ng-show="formType === 'login'" ng-submit="submitLogin()" novalidate>
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" name="email" ng-model="login.email" required
+                       list="emailSuggestions" autocomplete="off" placeholder="Email">
+                <datalist id="emailSuggestions">
+                    <option value="user@gmail.com">
+                    <option value="user@nmims.in">
+                    <option value="user@example.com">
+                </datalist>
+                <!-- This is the datalist of the home page -->
+                <span ng-show="loginForm.email.$error.required && loginForm.email.$touched">Email is required.</span>
+                <span ng-show="loginForm.email.$error.email && loginForm.email.$touched">Invalid email format.</span>
+                <span ng-show="login.email && !isValidEmailDomain(login.email)">Invalid email.</span>
+
+                <label for="loginPassword">Password</label>
+                <!-- This is the label for the password of the home page -->
+                <input type="{{showPassword ? 'text' : 'password'}}" id="loginPassword" name="password" 
+                       ng-model="login.password" required placeholder="Password">
+                <div class="show-password-container">
+                    <!-- This is the container for the show password of the home page -->
+                    <input type="checkbox" id="showPassword" ng-model="showPassword">
+                    <label for="showPassword">Show password</label>
+                </div>
+                <!-- This is the span for the password of the home page -->
+                <span ng-show="loginForm.password.$error.required && loginForm.password.$touched">Password is required.</span>
+                <span ng-show="login.password && login.password !== 'Pass*2023'">Invalid password</span>
+
+                <button type="submit" ng-disabled="loginForm.$invalid || login.password !== 'Pass*2023'">Sign in</button>
+                <!-- This is the button for the sign in of the home page -->
+            </form>
+
+            <div class="divider">
+                <!-- This is the divider of the home page -->
+                <span>or</span>
+            </div>
+            <!-- Creates registration form with multiple fields, Includes validation for phone number and password, Uses AngularJS for form handling -->
+            <form name="registerForm" ng-show="formType === 'register'" ng-submit="submitRegister()" novalidate>
+                <h2>Join now</h2>
+                <label for="displayName">Display Name</label>
+                <input type="text" id="displayName" name="displayName" ng-model="register.displayName" 
+                       required placeholder="Display Name">
+                <span ng-show="registerForm.displayName.$error.required && registerForm.displayName.$touched">Display name is required.</span>
+
+                <label for="registerEmail">Email</label>
+                <input type="email" id="registerEmail" name="email" ng-model="register.email" 
+                       required placeholder="Email">
+                <span ng-show="registerForm.email.$error.required && registerForm.email.$touched">Email is required.</span>
+                <span ng-show="registerForm.email.$error.email && registerForm.email.$touched">Invalid email format.</span>
+
+                <label for="phoneNumber">Phone Number</label>
+                <input type="tel" id="phoneNumber" name="phoneNumber" ng-model="register.phoneNumber" 
+                       ng-pattern="/^\d{10}$/" required placeholder="Phone Number">
+                <span ng-show="registerForm.phoneNumber.$error.required && registerForm.phoneNumber.$touched">Phone number is required.</span>
+                <span ng-show="registerForm.phoneNumber.$error.pattern && registerForm.phoneNumber.$touched">Phone number must be 10 digits.</span>
+
+                <label for="registerPassword">Password</label>
+                <input type="password" id="registerPassword" name="password" ng-model="register.password" 
+                       ng-minlength="6" required placeholder="Password">
+                <span ng-show="registerForm.password.$error.required && registerForm.password.$touched">Password is required.</span>
+                <span ng-show="registerForm.password.$error.minlength && registerForm.password.$touched">Password must be at least 6 characters long.</span>
+
+                <button type="submit" ng-disabled="registerForm.$invalid">Join now</button>
+            </form>
+            <!-- This is the join now of the home page -->
+            <div class="join-now" ng-show="formType === 'login'">
+                <p>New to Connect\o? <a href="#" ng-click="showForm('register')">Join now</a></p>
+            </div>
+            <!-- This is the join now of the home page -->
+            <div class="join-now" ng-show="formType === 'register'">
+                <p>Already on Connect\o? <a href="#" ng-click="showForm('login')">Sign in</a></p>
+            </div>
+        </div>
+    </div>
+    <!-- This is the container of the home page --> 
+    <script>
+        const app = angular.module('homeApp', []);
+        // This is the app of the home page 
+        app.controller('HomeController', ['$scope', '$window', function($scope, $window) {
+            $scope.formType = 'login';
+            $scope.showPassword = false;
+            // This is the show password of the home page 
+            $scope.isValidEmailDomain = function(email) {
+                if (!email) return false;
+                const validDomains = ['@gmail.com', '@nmims.in', '@example.com'];
+                return validDomains.some(domain => email.toLowerCase().endsWith(domain));
+            };
+            // This is the show form of the home page 
+            $scope.showForm = function(type) {
+                $scope.formType = type;
+            };
+            // This is the submit login of the home page 
+            $scope.submitLogin = function() {
+                if ($scope.login && $scope.login.email && $scope.login.password === 'Pass*2023') {
+                    $window.location.href = 'Project.html';
+                }
+            };
+            // This is the submit register of the home page 
+            $scope.submitRegister = function() {
+                if ($scope.register && $scope.register.displayName && $scope.register.email && $scope.register.phoneNumber && $scope.register.password) {
+                    $window.location.href = 'Project.html';
+                }
+            };
+        }]);
+    </script>
+</body>
+</html>
